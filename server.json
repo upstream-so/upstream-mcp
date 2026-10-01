@@ -2,9 +2,9 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "so.upstream/upstream",
   "title": "Upstream",
-  "description": "Run cloud live streaming from an AI assistant: start and stop streams, reorder playback queues, search the media library, plan schedules, and manage multistream destinations.",
-  "version": "1.0.0",
-  "websiteUrl": "https://upstream.so/mcp",
+  "description": "Manage live streams, playback queues, media, schedules, and multistream destinations.",
+  "version": "1.0.1",
+  "websiteUrl": "https://upstream.so/mcp/",
   "repository": {
     "url": "https://github.com/upstream-so/upstream-mcp",
     "source": "github"
@@ -16,7 +16,7 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "Bearer token — an Upstream Personal Access Token from Profile → API Keys, sent as 'Bearer <token>'.",
+          "description": "Upstream API key from Profile \u2192 API Keys, sent as 'Bearer <token>'.",
           "isRequired": true,
           "isSecret": true
         }

@@ -22,17 +22,42 @@ It is a **remote** server — nothing to install, no npm package, no local proce
 | --------- | ---------------------------------- |
 | URL       | `https://studio.upstream.so/mcp`   |
 | Transport | Streamable HTTP                    |
-| Auth      | `Authorization: Bearer <token>`    |
+| Auth      | `Authorization: Bearer <API key>`; OAuth rollout in progress |
 
 ## Authentication
 
-You need a **Personal Access Token** from your dashboard: **Profile → API Keys**. Create a dedicated token for each AI client so you can revoke one without disturbing the others.
+OAuth rollout is in progress. Use an API key for now. The ChatGPT and Claude sign-in steps below apply once activation is complete.
 
-A token grants access to everything in your account — the same reach as the REST API. Store it in your client's secret settings, never in a shared config file or a prompt.
+Connect with **OAuth** when your client supports it. Add the server URL, sign in directly on `studio.upstream.so`, and review the requested access. Your AI client receives an access token, never your Upstream password. Remove its access under **Profile → Connected apps**.
 
-> Older setup guides used an `X-Upstream-Api-Key` header. That still works, so existing configs keep running, but new clients should send `Authorization: Bearer`.
+For clients with custom request headers, a **Personal Access Token** remains available under **Profile → API Keys**. Create a dedicated key for each client and store it in the client's secret settings. Existing API-key connections keep working.
+
+Both methods grant access to the supported MCP tools for your account, including actions that change or delete data. OAuth's `mcp:use` scope is not a read-only mode. Enable your client's approval prompts and begin with a read-only request.
+
+> The legacy `X-Upstream-Api-Key` header still works. New API-key connections should send `Authorization: Bearer`.
 
 ## Connecting
+
+### ChatGPT
+
+1. Enable **Developer mode** under **Settings → Security and login**, if your account and workspace allow it.
+2. Open **Plugins**, select the plus button, and name the connection **Upstream**.
+3. Enter `https://studio.upstream.so/mcp`. Choose OAuth authentication when prompted.
+4. Sign in on Upstream, review the consent screen, and approve the connection.
+5. Start a new conversation and select Upstream from the tools menu.
+
+This uses a custom MCP connection. It does not require a published ChatGPT app. See [OpenAI's connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt) for current availability and settings.
+
+### Claude
+
+1. Open **Customize → Connectors** and select **+ → Add custom connector**.
+2. Name it **Upstream** and enter `https://studio.upstream.so/mcp`.
+3. Add the connector, select **Connect**, and sign in on Upstream to review and approve access.
+4. Enable Upstream from the conversation's Connectors menu.
+
+Custom connectors depend on your plan. Team and Enterprise owners must first add the connector for their organization. See [Claude's custom connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+
+### Clients using API keys
 
 **Claude Code**
 
@@ -73,13 +98,13 @@ claude mcp add --transport http --scope user upstream \
 }
 ```
 
-Any client that speaks remote Streamable HTTP and lets you set a header will work. ChatGPT is not supported yet — its connector UI requires OAuth, which this server does not offer.
+Clients that support remote Streamable HTTP and custom request headers can use the API-key examples above. Never paste a real key into a prompt, shared project configuration, support ticket, or directory submission. OAuth clients discover authentication from the server; callback compatibility depends on the client.
 
 Verify the connection with a read-only call: ask the assistant to list your streams.
 
 ## Tools
 
-31 tools, one per public API endpoint.
+Tools use the same account ownership, validation, and rate limits as the public API.
 
 ### Streams
 
@@ -115,6 +140,7 @@ Each stream owns queues by type: `video`, `audio`, `audio-secondary`, `external-
 | `update_media` | Update name and audio tags (title, artist, album, year, genre). |
 | `delete_media` | Permanently delete a file. It also disappears from any queue referencing it. |
 | `create_upload_ticket` | Mint a TUS upload ticket so the client can upload files itself. |
+| `revoke_upload_tickets` | Revoke active upload tickets for the account. |
 
 A freshly uploaded file is *processing* until `get_media` reports `is_processing: false`. It can only be queued after that.
 
@@ -152,7 +178,7 @@ A freshly uploaded file is *processing* until `get_media` reports `is_processing
 
 MCP carries JSON, not file bytes, so `create_upload_ticket` hands the upload back to the client: it returns a TUS endpoint and a 24-hour token, and the assistant's own shell moves the bytes.
 
-The ticket token is **single-active per account** — minting a new one revokes the previous. For a batch, mint once and reuse it. Runnable examples in several languages live in [upstream-upload-examples][examples].
+Reuse one ticket per batch when practical. Minting a new ticket renews the same family without revoking in-flight uploads. Use `revoke_upload_tickets` to invalidate active tickets. Runnable examples in several languages live in [upstream-upload-examples][examples].
 
 ## Rate limits and errors
 
@@ -164,6 +190,7 @@ Resources belong to the token's account only: a foreign id returns 403, an unkno
 
 - [API documentation][api] · [OpenAPI spec][openapi] · [Postman collection][postman]
 - [Model Context Protocol][mcp]
+- [Connection setup](https://upstream.so/mcp/) · [Publishing and directory submissions](docs/publishing.md)
 
 ## About Upstream
 

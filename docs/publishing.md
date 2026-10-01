@@ -40,9 +40,9 @@ the hosted server implementation is not distributed here.
    [DNS or HTTP authentication](https://modelcontextprotocol.io/registry/authentication).
    GitHub authentication only covers `io.github.*` namespaces; do not rename an
    existing server to avoid verification. Keep publishing credentials outside Git.
-   After OAuth is verified, remove the required static Authorization header from
-   `server.json`, increment its version, and remove the rollout notices from the
-   README and setup page. OAuth clients discover authentication from the endpoint.
+   After an authenticated production connection is verified, remove the required
+   static Authorization header from `server.json` and increment its version before
+   publishing. OAuth clients discover authentication from the endpoint.
 2. **[Glama connectors](https://glama.ai/mcp/connectors).** Use the remote connector
    submission, not the source-code hosting flow. Glama documents dynamic client
    registration, which can avoid sharing test credentials. Verify its exact OAuth

@@ -22,11 +22,9 @@ It is a **remote** server — nothing to install, no npm package, no local proce
 | --------- | ---------------------------------- |
 | URL       | `https://studio.upstream.so/mcp`   |
 | Transport | Streamable HTTP                    |
-| Auth      | `Authorization: Bearer <API key>`; OAuth rollout in progress |
+| Auth      | OAuth (recommended); API key fallback |
 
 ## Authentication
-
-OAuth rollout is in progress. Use an API key for now. The ChatGPT and Claude sign-in steps below apply once activation is complete.
 
 Connect with **OAuth** when your client supports it. Add the server URL, sign in directly on `studio.upstream.so`, and review the requested access. Your AI client receives an access token, never your Upstream password. Remove its access under **Profile → Connected apps**.
 
@@ -57,48 +55,63 @@ This uses a custom MCP connection. It does not require a published ChatGPT app. 
 
 Custom connectors depend on your plan. Team and Enterprise owners must first add the connector for their organization. See [Claude's custom connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 
-### Clients using API keys
-
-**Claude Code**
+### Claude Code
 
 ```bash
 claude mcp add --transport http --scope user upstream \
-  https://studio.upstream.so/mcp \
-  --header "Authorization: Bearer YOUR_UPSTREAM_TOKEN"
+  https://studio.upstream.so/mcp
 ```
 
-**VS Code** — `mcp.json`
+Open Claude Code, run `/mcp`, and select Upstream to authenticate. Sign in on Upstream and approve access, then run `/mcp` again to check the connection. See the [Claude Code MCP guide](https://code.claude.com/docs/en/mcp).
+
+### VS Code
+
+Run **MCP: Open User Configuration** from the Command Palette and add Upstream to `mcp.json`, keeping any other servers already configured:
 
 ```json
 {
   "servers": {
     "upstream": {
       "type": "http",
-      "url": "https://studio.upstream.so/mcp",
-      "headers": {
-        "Authorization": "Bearer ${input:upstream-token}"
-      }
+      "url": "https://studio.upstream.so/mcp"
     }
   }
 }
 ```
 
-**Kimi Code** — `~/.kimi-code/mcp.json`
+Start Upstream from the server configuration and follow the authentication prompt. Sign in on Upstream and approve access. VS Code discovers the OAuth settings automatically; no API key or client secret is needed. See the [VS Code MCP guide](https://code.visualstudio.com/docs/agent-customization/mcp-servers).
+
+### Kimi Code
+
+Add Upstream to `~/.kimi-code/mcp.json`, keeping any other servers already configured:
 
 ```json
 {
   "mcpServers": {
     "upstream": {
-      "url": "https://studio.upstream.so/mcp",
-      "headers": {
-        "Authorization": "Bearer YOUR_UPSTREAM_TOKEN"
-      }
+      "url": "https://studio.upstream.so/mcp"
     }
   }
 }
 ```
 
-Clients that support remote Streamable HTTP and custom request headers can use the API-key examples above. Never paste a real key into a prompt, shared project configuration, support ticket, or directory submission. OAuth clients discover authentication from the server; callback compatibility depends on the client.
+Start a new Kimi Code session and run `/mcp-config login upstream`. Sign in on Upstream and approve access, then run `/mcp` to check the connection. You can also add the server interactively with `/mcp-config`. See the [Kimi Code MCP guide](https://www.kimi.com/code/docs/en/kimi-code-cli/customization/mcp.html).
+
+### Switching an existing connection to OAuth
+
+Existing API-key connections keep working. To switch, remove the saved `Authorization` header or API-key setting from the Upstream server configuration, then reconnect and follow your client's sign-in steps above. A configured API-key header can prevent the client from starting OAuth.
+
+### API-key alternative
+
+Scripts and clients without OAuth can use a dedicated key from **Profile → API Keys**. Use the same endpoint and store this header in the client's secret settings:
+
+```http
+Authorization: Bearer YOUR_UPSTREAM_TOKEN
+```
+
+Replace the placeholder with your key only in those settings. Never paste a real key into a prompt, shared project configuration, support ticket, or directory submission.
+
+Other clients need remote Streamable HTTP and OAuth or custom request headers. OAuth callback compatibility depends on the client.
 
 Verify the connection with a read-only call: ask the assistant to list your streams.
 

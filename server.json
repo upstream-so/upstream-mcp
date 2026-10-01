@@ -3,7 +3,7 @@
   "name": "so.upstream/upstream",
   "title": "Upstream",
   "description": "Manage live streams, playback queues, media, schedules, and multistream destinations.",
-  "version": "1.1.0",
+  "version": "1.0.1",
   "websiteUrl": "https://upstream.so/mcp/",
   "repository": {
     "url": "https://github.com/upstream-so/upstream-mcp",
@@ -12,7 +12,15 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://studio.upstream.so/mcp"
+      "url": "https://studio.upstream.so/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Upstream API key from Profile \u2192 API Keys, sent as 'Bearer <token>'.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
     }
   ]
 }

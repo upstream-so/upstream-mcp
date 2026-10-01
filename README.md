@@ -22,9 +22,11 @@ It is a **remote** server — nothing to install, no npm package, no local proce
 | --------- | ---------------------------------- |
 | URL       | `https://studio.upstream.so/mcp`   |
 | Transport | Streamable HTTP                    |
-| Auth      | OAuth sign-in, or `Authorization: Bearer <API key>` |
+| Auth      | `Authorization: Bearer <API key>`; OAuth rollout in progress |
 
 ## Authentication
+
+OAuth rollout is in progress. Use an API key for now. The ChatGPT and Claude sign-in steps below apply once activation is complete.
 
 Connect with **OAuth** when your client supports it. Add the server URL, sign in directly on `studio.upstream.so`, and review the requested access. Your AI client receives an access token, never your Upstream password. Remove its access under **Profile → Connected apps**.
 
